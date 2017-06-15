@@ -17,13 +17,24 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     bool getSpectrometer () ;
-    void setStatusLabel (QString s) ;
+
     CConsoleHelper *chdpp ;
     X123 *x123 ;
+    float *xvals, *yvals ;
+    int totalSecs, curTime ;
+
 
 protected:
     void changeEvent(QEvent *e);
     bool haveSpec ;
+private slots:
+    void on_acquireButton_clicked();
+    void newdata() ;
+    void newdata(int secs) ;
+    void endAcquire() ;
+    void setStatusLabel (QString s) ;
+
+
 private:
     Ui::MainWindow *ui;
 };

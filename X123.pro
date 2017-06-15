@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,7 +22,10 @@ SOURCES += main.cpp\
     DeviceIO/DP5Protocol.cpp \
     stringex.cpp \
     ConsoleHelper.cpp \
-    x123.cpp
+    x123.cpp \
+    qcustomplot.cpp \
+    myprofileplot.cpp \
+    plotscaledialog.cpp
 
 HEADERS  += mainwindow.h \
     DeviceIO/SendCommand.h \
@@ -35,9 +38,13 @@ HEADERS  += mainwindow.h \
     stringSplit.h \
     stringex.h \
     ConsoleHelper.h \
-    x123.h
+    x123.h \
+    qcustomplot.h \
+    myprofileplot.h \
+    plotscaledialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    plotscaledialog.ui
 
 INCLUDEPATH += ../X123/DeviceIO
 

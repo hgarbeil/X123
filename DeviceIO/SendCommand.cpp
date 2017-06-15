@@ -760,12 +760,12 @@ string CSendCommand::RemWhitespace(string strLine)
 	string strNoWSp;
 	
 	strNoWSp = "";
-	if (strLine.find_first_of(Whitespace, 0) == std::string::npos) {		// string has no whitespace
+    if (strLine.find_first_of(Whitespace1, 0) == std::string::npos) {		// string has no whitespace
 		return strLine;
 	} else {			// remove whitespace
 		for (idxCh=0;idxCh<strLine.length();idxCh++) {
 			strCh = strLine.substr(idxCh,1);
-			if (strCh.find_first_of(Whitespace, 0) == std::string::npos) {		// char is not whitespace
+            if (strCh.find_first_of(Whitespace1, 0) == std::string::npos) {		// char is not whitespace
 				strNoWSp += strCh;
 			}
 		}
