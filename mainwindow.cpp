@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "iostream"
+#include <time.h>
 using namespace std ;
 
 
@@ -86,6 +87,7 @@ void MainWindow::setStatusLabel (QString s){
 void MainWindow::on_acquireButton_clicked()
 {
     int timeSecs = ui->accumTimeLE->text().toInt() ;
+    this->getOutputSpectrumFile () ;
     if (timeSecs != curTime){
         x123->SendPresetAcquisitionTime(timeSecs) ;
         curTime = timeSecs ;
@@ -95,6 +97,24 @@ void MainWindow::on_acquireButton_clicked()
     ui->acquireButton->setStyleSheet("color:black;background-color:yellow") ;
     totalSecs = 0 ;
     x123->StartAcquisition() ;
+
+}
+
+
+// get timestamped ouput file
+void MainWindow::getOutputSpectrumFile() {
+    time_t curtime ;
+    struct tm *loctime ;
+    char timestring[80] ;
+    curtime = time(NULL) ;
+    loctime = localtime (&curtime) ;
+
+
+    QString str = ui->PrefixLE->text() ;
+    sprintf (timestring,"_%04d%02d%02d%02d%02d%02d.mca", loctime->tm_year, loctime->tm_mon,
+             loctime->tm_mday, loctime->tm_hour, loctime->tm_min, loctime->tm_sec);
+    QString str1 = QString("%1%2").arg(str).arg(timestring);
+    x123->SetSpectrumFile (str1.toLatin1().data()) ;
 
 }
 

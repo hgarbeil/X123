@@ -19,6 +19,10 @@ public:
     void AcquireSpectrum () ;
     void StartAcquisition() ;
     bool ClearSpectrum () ;
+    // Saving spectrum file
+    void SaveSpectrumFile() ;
+    void SetSpectrumFile (char *) ;
+
     bool ReadConfigFile(char *) ;
     void ReadDppConfigurationFromHardware(bool);
     void DisplayPresets () ;

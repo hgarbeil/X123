@@ -9,6 +9,7 @@ using namespace std;
 #define LINE_MAX 256
 #define DP4_PX4_OLD_CFG_SIZE 64
 #define DP5_MAX_CFG_SIZE 512			/// 512 + 8 Bytes (2 SYNC,2 PID,2 LEN,2 CHKSUM)
+// changed Whitespace to Whitespace1 - conflicting w/ QPrintSupport include file
 #define Whitespace1 "\t\n\v\f\r\0x20"
 /// $ = Chr$(0) + Chr$(9) + Chr$(10) + Chr$(11) + Chr$(12) + Chr$(13) + Chr$(32)
 

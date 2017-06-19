@@ -17,6 +17,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     bool getSpectrometer () ;
+    void getOutputSpectrumFile () ;
 
     CConsoleHelper *chdpp ;
     X123 *x123 ;

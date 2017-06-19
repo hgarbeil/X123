@@ -160,7 +160,7 @@ void X123::StartAcquisition(){
                 if (chdpp->LibUsb_ReceiveData()) {
                         bDisableMCA = true;				// we are aquiring data, disable mca when done
                         //system(CLEAR_TERM);
-                        //chdpp.ConsoleGraph(chdpp.DP5Proto.SPECTRUM.DATA,chdpp.DP5Proto.SPECTRUM.CHANNELS,true,chdpp.DppStatusString);
+                        //chdpp->ConsoleGraph(chdpp->DP5Proto.SPECTRUM.DATA,chdpp->DP5Proto.SPECTRUM.CHANNELS,true,chdpp->DppStatusString);
                         for (int i=0; i<4096; i++){
                             specData[i] = chdpp->DP5Proto.SPECTRUM.DATA[i] ;
                         }
@@ -184,7 +184,8 @@ void X123::StartAcquisition(){
         }
 
     emit(endAcquire()) ;
-
+    // Saving spectrum file
+    SaveSpectrumFile() ;
 }
 
 
@@ -192,7 +193,8 @@ void X123::AcquireSpectrum() {
 
 
     this->StartAcquisition () ;
-
+    // Saving spectrum file
+    SaveSpectrumFile() ;
 
 }
 
@@ -212,7 +214,7 @@ void X123::ReadDppConfigurationFromHardware(bool bDisplayCfg) {
             cout << endl;
             cout << "\tRequesting Full Configuration..." << endl;
             chdpp->ClearConfigReadFormatFlags();	// clear all flags, set flags only for specific readback properties
-            //chdpp.DisplayCfg = false;	// DisplayCfg format overrides general readback format
+            //chdpp->DisplayCfg = false;	// DisplayCfg format overrides general readback format
             chdpp->CfgReadBack = true;	// requesting general readback format
             if (chdpp->LibUsb_SendCommand_Config(XMTPT_FULL_READ_CONFIG_PACKET, CfgOptions)) {	// request full configuration
                 if (chdpp->LibUsb_ReceiveData()) {
@@ -234,4 +236,22 @@ void X123::ReadDppConfigurationFromHardware(bool bDisplayCfg) {
     }
 
 
+}
+
+void X123::SetSpectrumFile (char *ifile) {
+    chdpp->SetSpectrumFile (ifile) ;
+}
+
+// Saving spectrum file
+void X123::SaveSpectrumFile()
+{
+    string strSpectrum;											// holds final spectrum file
+    chdpp->sfInfo.strSpectrumStatus = chdpp->DppStatusString;		// save last status after acquisition
+    chdpp->sfInfo.m_iNumChan = chdpp->mcaCH;						// number channels in spectrum
+    chdpp->sfInfo.SerialNumber = chdpp->DP5Stat.m_DP5_Status.SerialNumber;	// dpp serial number
+    chdpp->sfInfo.strDescription = "Amptek Spectrum File";					// description
+    chdpp->sfInfo.strTag = "TestTag";										// tag
+    // create spectrum file, save file to string
+    strSpectrum = chdpp->CreateMCAData(chdpp->DP5Proto.SPECTRUM.DATA,chdpp->sfInfo,chdpp->DP5Stat.m_DP5_Status);
+    chdpp->SaveSpectrumStringToFile(strSpectrum);	// save spectrum file string to file
 }
