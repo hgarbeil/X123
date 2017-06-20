@@ -46,6 +46,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     plotscaledialog.ui
 
-INCLUDEPATH += ../X123/DeviceIO
+INCLUDEPATH += ../X123/DeviceIO C:/Users/przem/workdir/libusb/
 
-LIBS += -L../X123/DeviceIO -lstdc++ -lm -llibusb
+LIBS += -L../X123/DeviceIO -LC:/Users/przem/workdir/libusb/MinGW32/dll -lstdc++ -lm -lusb-1.0

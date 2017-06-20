@@ -10,7 +10,7 @@ MyProfilePlot::MyProfilePlot(QWidget *parent) :
 {
 
     nprofiles = 2 ;
-    nptsProfile = 4096;
+    nptsProfile = 2048;
     QVector<double> x(101), y(101); // initialize with entries 0..100
     for (int i=0; i<101; ++i)
     {
@@ -27,7 +27,7 @@ MyProfilePlot::MyProfilePlot(QWidget *parent) :
     yAxis->setLabel("Counts");
     // set axes ranges, so we see all data:
     xAxis->setRange(0,nptsProfile);
-    yAxis->setRange(-5, 100);
+    yAxis->setRange(-5, 20);
     //vline = new QCPItemLine (this) ;
     //vline->start->setCoords (QPointF(104.,0.)) ;
     //vline->end->setCoords(QPointF(104, 14000)) ;

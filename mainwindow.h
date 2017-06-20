@@ -23,6 +23,7 @@ public:
     X123 *x123 ;
     float *xvals, *yvals ;
     int totalSecs, curTime ;
+    int nptsSpec ;
 
 
 protected:
@@ -35,6 +36,8 @@ private slots:
     void endAcquire() ;
     void setStatusLabel (QString s) ;
 
+
+    void on_PrefixBrowseButton_clicked();
 
 private:
     Ui::MainWindow *ui;

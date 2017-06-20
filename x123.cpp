@@ -12,8 +12,10 @@ X123::X123(QObject *parent) :
     bRunConfigurationTest = false ;
     bHaveStatusResponse = false ;
     bHaveConfigFromHW = false ;
-    specData = new long [4096] ;
-    for (int i =0 ; i<4096; i++) {
+
+    nptsSpec =2048 ;
+    specData = new long [nptsSpec] ;
+    for (int i =0 ; i<nptsSpec; i++) {
         specData[i] = 0 ;
     }
     curSecs = 20 ;
@@ -161,7 +163,7 @@ void X123::StartAcquisition(){
                         bDisableMCA = true;				// we are aquiring data, disable mca when done
                         //system(CLEAR_TERM);
                         //chdpp->ConsoleGraph(chdpp->DP5Proto.SPECTRUM.DATA,chdpp->DP5Proto.SPECTRUM.CHANNELS,true,chdpp->DppStatusString);
-                        for (int i=0; i<4096; i++){
+                        for (int i=0; i<nptsSpec; i++){
                             specData[i] = chdpp->DP5Proto.SPECTRUM.DATA[i] ;
                         }
 

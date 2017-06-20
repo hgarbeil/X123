@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "iostream"
 #include <time.h>
+#include <QFile>
 using namespace std ;
 
 
@@ -10,22 +11,25 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
 
+    char conffile [240] ;
     ui->setupUi(this);
     haveSpec = false ;
     // create the x123 instance
     x123 = new X123 () ;
     // get the spectrometer
     getSpectrometer() ;
-    x123->ReadConfigFile("PX5_Console_Test.txt") ;
+    strcpy (conffile,"C:/Users/przem/workdir/X123/PX5_Console_Test.txt") ;
+    x123->ReadConfigFile(conffile) ;
     x123->ClearSpectrum () ;
+    nptsSpec = x123->nptsSpec ;
 
-    xvals = new float [4096] ;
-    yvals = new float [4096] ;
-    for (int i=0; i<4096; i++){
+    xvals = new float [nptsSpec] ;
+    yvals = new float [nptsSpec] ;
+    for (int i=0; i<nptsSpec; i++){
         xvals [i]=i;
         yvals [i]=0;
     }
-    ui->SpectrumPlot->setXYData (xvals, yvals, 4096) ;
+    ui->SpectrumPlot->setXYData (xvals, yvals, nptsSpec) ;
 
     ui->acquireButton->setStyleSheet("color:yellow;background-color:green") ;
     totalSecs = 0 ;
@@ -111,7 +115,8 @@ void MainWindow::getOutputSpectrumFile() {
 
 
     QString str = ui->PrefixLE->text() ;
-    sprintf (timestring,"_%04d%02d%02d%02d%02d%02d.mca", loctime->tm_year, loctime->tm_mon,
+    sprintf (timestring,"_%04d%02d%02d%02d%02d%02d.mca", loctime->tm_year+1900,
+             loctime->tm_mon+1,
              loctime->tm_mday, loctime->tm_hour, loctime->tm_min, loctime->tm_sec);
     QString str1 = QString("%1%2").arg(str).arg(timestring);
     x123->SetSpectrumFile (str1.toLatin1().data()) ;
@@ -120,8 +125,8 @@ void MainWindow::getOutputSpectrumFile() {
 
 void MainWindow::newdata() {
     int i ;
-    for (i=0;i<4096;i++)yvals[i] = x123->specData[i];
-    ui->SpectrumPlot->setXYData (xvals, yvals, 4096) ;
+    for (i=0;i<nptsSpec;i++)yvals[i] = x123->specData[i];
+    ui->SpectrumPlot->setXYData (xvals, yvals, nptsSpec) ;
     setStatusLabel ("Updating spectrum") ;
 
 }
@@ -130,16 +135,22 @@ void MainWindow::newdata(int secs) {
     int i ;
     QString statstring = QString ("Updating spectrum : %1 secs").arg (secs);
 
-    for (i=0;i<4096;i++)yvals[i] = x123->specData[i];
-    ui->SpectrumPlot->setXYData (xvals, yvals, 4096) ;
+    for (i=0;i<nptsSpec;i++)yvals[i] = x123->specData[i];
+    ui->SpectrumPlot->setXYData (xvals, yvals, nptsSpec) ;
     setStatusLabel (statstring) ;
 
 }
 
 void MainWindow::endAcquire() {
     int i ;
-    for (i=0;i<4096;i++)yvals[i] = x123->specData[i];
-    ui->SpectrumPlot->setXYData (xvals, yvals, 4096) ;
+    for (i=0;i<nptsSpec;i++)yvals[i] = x123->specData[i];
+    ui->SpectrumPlot->setXYData (xvals, yvals, nptsSpec) ;
     setStatusLabel ("Acquisition Complete") ;
     ui->acquireButton->setStyleSheet("color:yellow;background-color:green") ;
+}
+
+void MainWindow::on_PrefixBrowseButton_clicked()
+{
+    QString prefx = QFileDialog::getSaveFileName (this, "Output Spectrum File Prefix") ;
+    ui->PrefixLE->setText(prefx) ;
 }

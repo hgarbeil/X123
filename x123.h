@@ -28,6 +28,7 @@ public:
     void DisplayPresets () ;
     bool haveSpec ;
     int curSecs ;
+    int nptsSpec ;
     long *specData ;
 
 protected :
