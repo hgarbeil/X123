@@ -6,6 +6,8 @@
 using namespace std ;
 
 
+// Construct the main window and related buttons
+// as well as initialize spectrometer X123 class
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -33,8 +35,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->acquireButton->setStyleSheet("color:yellow;background-color:green") ;
     totalSecs = 0 ;
+
+    // set acquisition time to 20 seconds
     curTime = 20 ;
     x123->SendPresetAcquisitionTime(curTime) ;
+    // connect signals to slots
     connect (x123, SIGNAL(updData(int)), this, SLOT(newdata(int))) ;
     connect (x123, SIGNAL(endAcquire()), this, SLOT(endAcquire())) ;
     connect (x123, SIGNAL(sendStatus(QString)), this, SLOT(setStatusLabel(QString))) ;
@@ -66,7 +71,7 @@ void MainWindow::changeEvent(QEvent *e)
 
 }
 
-
+// connect to the spectrometer
 bool MainWindow::getSpectrometer() {
 
     haveSpec = x123->ConnectUSB() ;
@@ -81,7 +86,7 @@ bool MainWindow::getSpectrometer() {
     return true ;
 }
 
-
+// put string in status window
 void MainWindow::setStatusLabel (QString s){
     QString status ("Status : "+s) ;
     ui->statusLabel->setText (status) ;
@@ -90,6 +95,7 @@ void MainWindow::setStatusLabel (QString s){
 // user interface event handler for acquire button
 void MainWindow::on_acquireButton_clicked()
 {
+    this->setCursor (Qt::WaitCursor) ;
     int timeSecs = ui->accumTimeLE->text().toInt() ;
     this->getOutputSpectrumFile () ;
     if (timeSecs != curTime){
@@ -119,6 +125,13 @@ void MainWindow::getOutputSpectrumFile() {
              loctime->tm_mon+1,
              loctime->tm_mday, loctime->tm_hour, loctime->tm_min, loctime->tm_sec);
     QString str1 = QString("%1%2").arg(str).arg(timestring);
+    QFile tstr (str1) ;
+    bool status = tstr.isWritable() ;
+    if (!status){
+        QMessageBox::warning (this, tr("X123 Control"),
+            tr ("Could not save to file"), QMessageBox::Ok) ;
+
+    }
     x123->SetSpectrumFile (str1.toLatin1().data()) ;
 
 }
@@ -147,6 +160,7 @@ void MainWindow::endAcquire() {
     ui->SpectrumPlot->setXYData (xvals, yvals, nptsSpec) ;
     setStatusLabel ("Acquisition Complete") ;
     ui->acquireButton->setStyleSheet("color:yellow;background-color:green") ;
+    this->setCursor (Qt::ArrowCursor) ;
 }
 
 void MainWindow::on_PrefixBrowseButton_clicked()
