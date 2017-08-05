@@ -127,6 +127,7 @@ void MainWindow::getOutputSpectrumFile() {
     QString str1 = QString("%1%2").arg(str).arg(timestring);
     QFile tstr (str1) ;
     bool status = tstr.isWritable() ;
+    status = true ;
     if (!status){
         QMessageBox::warning (this, tr("X123 Control"),
             tr ("Could not save to file"), QMessageBox::Ok) ;

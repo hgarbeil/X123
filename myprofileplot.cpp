@@ -97,7 +97,7 @@ void MyProfilePlot::setXYData (float *x, float *y, int npts){
     }
     graph(0)->setData(xdata, ydata) ;
 
-    //yAxis->rescale (true) ;
+    yAxis->rescale (true) ;
     //rescaleAxes() ;
     this->replot() ;
 }

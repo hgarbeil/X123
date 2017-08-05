@@ -47,8 +47,13 @@ unix:!symbian {
 }
 
 
-INCLUDEPATH += .\ ..\DeviceIO C:\hg\workdir\libusb\include
-LIBS +=  -L..\DeviceIO -llibusb
+#INCLUDEPATH += .\ ..\DeviceIO C:\hg\workdir\libusb\include
+#LIBS +=  -L..\DeviceIO -llibusb
+INCLUDEPATH += ../DeviceIO C:/Users/przem/workdir/libusb/
+
+LIBS += -L../DeviceIO -LC:/Users/przem/workdir/libusb/MinGW32/dll -lstdc++ -lm -lusb-1.0
+
+
 OTHER_FILES += \
     DP5Protocol.o \
     ConsoleHelper.o
