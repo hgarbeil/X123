@@ -1,35 +1,32 @@
-#include "x123dll.h"
+#include "x123.h"
 #include <iostream>
-using namespace std;
+#include <stdio.h>
+using namespace std ;
 
-
-X123DLL::X123DLL()
+X123::X123(QObject *parent) :
+    QObject(parent)
 {
-    cout << "starting X123 dll" << endl ;
     chdpp = new CConsoleHelper () ;
-    cout << "staring chdpp" << endl ;
-        haveSpec = false ;
-        bRunSpectrumTest = false ;
-        bRunConfigurationTest = false ;
-        bHaveStatusResponse = false ;
-        bHaveConfigFromHW = false ;
+    haveSpec = false ;
+    bRunSpectrumTest = false ;
+    bRunConfigurationTest = false ;
+    bHaveStatusResponse = false ;
+    bHaveConfigFromHW = false ;
 
-        nptsSpec =2048 ;
-        specData = new long [nptsSpec] ;
-        for (int i =0 ; i<nptsSpec; i++) {
-            specData[i] = 0 ;
-        }
-        curSecs = 20 ;
+    nptsSpec =2048 ;
+    specData = new long [nptsSpec] ;
+    for (int i =0 ; i<nptsSpec; i++) {
+        specData[i] = 0 ;
+    }
+    curSecs = 20 ;
 }
 
-
-
-X123DLL::~X123DLL (){
+X123::~X123 (){
     DisconnectUSB() ;
     delete [] specData ;
 }
 
-bool X123DLL::ConnectUSB () {
+bool X123::ConnectUSB () {
     cout << endl;
     cout << "Running DPP LibUsb tests from console..." << endl;
     cout << endl;
@@ -49,7 +46,7 @@ bool X123DLL::ConnectUSB () {
     return (haveSpec) ;
 }
 
-void X123DLL::GetDppStatus () {
+void X123::GetDppStatus () {
     if (chdpp->LibUsb_isConnected) { // send and receive status
             cout << endl;
             cout << "\tRequesting Status..." << endl;
@@ -69,11 +66,11 @@ void X123DLL::GetDppStatus () {
                 cout << "\t\tError sending status." << endl;
             }
         }
-
+        //this->SendPresetAcquisitionTime(20) ;
 }
 
 
-void X123DLL::DisconnectUSB () {
+void X123::DisconnectUSB () {
 
     if (chdpp->LibUsb_isConnected) { // send and receive status
             cout << endl;
@@ -85,7 +82,7 @@ void X123DLL::DisconnectUSB () {
     return ;
 }
 
-bool X123DLL::ClearSpectrum () {
+bool X123::ClearSpectrum () {
 
 
     cout << "\tRunning spectrum test..." << endl;
@@ -100,7 +97,7 @@ bool X123DLL::ClearSpectrum () {
 }
 
 
-bool X123DLL::ReadConfigFile (char *cfile)  {
+bool X123::ReadConfigFile (char *cfile)  {
     FILE *cf = fopen (cfile,"r") ;
     if (cf==NULL) {
         cout << "Could not find config file : " << cfile<<endl ;
@@ -117,7 +114,7 @@ bool X123DLL::ReadConfigFile (char *cfile)  {
     return true ;
 }
 
-bool X123DLL::SendPresetAcquisitionTime(int sec)
+bool X123::SendPresetAcquisitionTime(int sec)
 {
     curSecs = sec ;
     CONFIG_OPTIONS CfgOptions;
@@ -142,7 +139,7 @@ bool X123DLL::SendPresetAcquisitionTime(int sec)
 }
 
 // Clears spectrum data and starts acquisition
-void X123DLL::StartAcquisition(){
+void X123::StartAcquisition(){
     int MaxMCA = curSecs / 2 + 1;
     int count = 0 ;
     bool bDisableMCA;
@@ -171,7 +168,7 @@ void X123DLL::StartAcquisition(){
                         }
 
                         Sleep(1990);
-                        //emit (updData(2*++count)) ;
+                        emit (updData(2*++count)) ;
                         //emit(setStatus("Updating spectrum")) ;
                 }
             }else {
@@ -188,13 +185,13 @@ void X123DLL::StartAcquisition(){
             }
         }
 
-
+    emit(endAcquire()) ;
     // Saving spectrum file
     SaveSpectrumFile() ;
 }
 
 
-void X123DLL::AcquireSpectrum() {
+void X123::AcquireSpectrum() {
 
 
     this->StartAcquisition () ;
@@ -203,14 +200,14 @@ void X123DLL::AcquireSpectrum() {
 
 }
 
-void X123DLL::DisplayPresets(){
+void X123::DisplayPresets(){
     if (bHaveConfigFromHW) {
         cout << "\t\t\tPreset Mode: " << chdpp->strPresetCmd << endl;
         cout << "\t\t\tPreset Settings: " << chdpp->strPresetVal << endl;
     }
 }
 
-void X123DLL::ReadDppConfigurationFromHardware(bool bDisplayCfg) {
+void X123::ReadDppConfigurationFromHardware(bool bDisplayCfg) {
     CONFIG_OPTIONS CfgOptions;
     if (bHaveStatusResponse && bRunConfigurationTest) {
             //test configuration functions
@@ -243,12 +240,12 @@ void X123DLL::ReadDppConfigurationFromHardware(bool bDisplayCfg) {
 
 }
 
-void X123DLL::SetSpectrumFile (char *ifile) {
+void X123::SetSpectrumFile (char *ifile) {
     chdpp->SetSpectrumFile (ifile) ;
 }
 
 // Saving spectrum file
-void X123DLL::SaveSpectrumFile()
+void X123::SaveSpectrumFile()
 {
     string strSpectrum;											// holds final spectrum file
     chdpp->sfInfo.strSpectrumStatus = chdpp->DppStatusString;		// save last status after acquisition
@@ -259,10 +256,4 @@ void X123DLL::SaveSpectrumFile()
     // create spectrum file, save file to string
     strSpectrum = chdpp->CreateMCAData(chdpp->DP5Proto.SPECTRUM.DATA,chdpp->sfInfo,chdpp->DP5Stat.m_DP5_Status);
     chdpp->SaveSpectrumStringToFile(strSpectrum);	// save spectrum file string to file
-}
-
-
-int main (int argc, char *argv[]) {
-
-    X123DLL *x123 = new X123DLL () ;
 }

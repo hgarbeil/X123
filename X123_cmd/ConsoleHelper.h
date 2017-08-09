@@ -12,6 +12,16 @@
 #include "ParsePacket.h"		// Packet Parser
 #include "SendCommand.h"		// Command Generator
 #include "DP5Status.h"			// Status Decoder
+#include <time.h>				// time library for rand seed
+
+typedef struct _SpectrumFileType {
+    string strTag;
+    string strDescription;
+    short m_iNumChan;
+	unsigned long SerialNumber;
+	string strSpectrumConfig;
+	string strSpectrumStatus;
+} SpectrumFileType;
 
 class CConsoleHelper
 {
@@ -130,6 +140,8 @@ public:
 	string GetCmdData(string strCmd, string strCfgData);
 	/// Replaces (or inserts a command description (comment) in a configuration command string.
 	string ReplaceCmdDesc(string strCmd, string strCfgData);
+	/// Appends a command description (comment) in a configuration command string.
+	string AppendCmdDesc(string strCmd, string strCfgData);
 	/// Returns the command decription (comment) in a configuration command string.
 	string GetCmdDesc(string strCmd);
 
@@ -144,7 +156,15 @@ public:
 	string strTriggerSlope;
 	string strTriggerPosition;
 	string strScopeGain;
+    string SpectrumFile ;
 
+    string CreateMCAData(long m_larDataBuffer[], SpectrumFileType sfInfo, DP4_FORMAT_STATUS cfgStatusLst);
+	/// Saves a spectrum data string to a default file (SpectrumData.mca).
+	void SaveSpectrumStringToFile(string strData);
+    string CreateSpectrumConfig(string strRawCfgIn) ;
+	vector<string> MakeDp5CmdList();
+	SpectrumFileType sfInfo;
+    void SetSpectrumFile (char *) ;
 };
 
 

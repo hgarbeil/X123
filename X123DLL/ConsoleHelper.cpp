@@ -4,11 +4,14 @@
 #include "stringSplit.h"
 #include "stringex.h"
 #include <string.h>
+#include <iostream>
 
 using namespace stringSplit;
+using namespace std ;
 
 CConsoleHelper::CConsoleHelper(void)
 {
+    cout << "in cchelper " << endl ;
 	DppLibUsb.NumDevices = 0;
 	LibUsb_isConnected = false;
 	LibUsb_NumDevices = 0;

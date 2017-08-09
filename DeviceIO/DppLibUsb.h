@@ -1,5 +1,5 @@
 #pragma once
-
+#include "lusb0_usb.h"
 #ifdef _WIN32
 	#define LIBUSB_WINUSB_BACKEND 1
 #endif
@@ -7,7 +7,7 @@
 #ifdef LIBUSB_WINUSB_BACKEND 
 	#include "libusb.h"
 	#ifdef _MSC_VER
-		#pragma comment(lib, ".\\DeviceIO\\libusb.lib")
+        #pragma comment(lib, "..\\DeviceIO\\libusb.lib")
 	#endif
 #else
 	#include <libusb.h>

@@ -13,6 +13,7 @@ CConsoleHelper::CConsoleHelper(void)
 	LibUsb_isConnected = false;
 	LibUsb_NumDevices = 0;
 	DppStatusString = "";
+    SpectrumFile = "Spectrum.mca" ;
 }
 
 CConsoleHelper::~CConsoleHelper(void)
@@ -404,7 +405,7 @@ string CConsoleHelper::GetCmdData(string strCmd, string strCfgData)
 	strCmdData = "";
 	if (strCfgData.length() < 7) { return strCmdData; }	// no data
 	if (strCmd.length() != 4) {	return strCmdData; }		// bad command
-	iCmd = (int)strCfgData.find(strCmd,0);
+	iCmd = (int)strCfgData.find(strCmd+"=",0);
 	if (iCmd == -1) { return strCmdData; }			// cmd not found	
 	iStart = (int)strCfgData.find("=",iCmd);						 
 	if (iStart == -1) { return strCmdData; }		// data start not found	
@@ -424,7 +425,7 @@ string CConsoleHelper::ReplaceCmdDesc(string strCmd, string strCfgData)
 	strNew = "";
 	if (strCfgData.length() < 7) { return strCfgData; }	// no data
 	if (strCmd.length() != 4) {	return strCfgData; }		// bad command
-	iCmd = (int)strCfgData.find(strCmd,0);
+	iCmd = (int)strCfgData.find(strCmd+"=",0);
 	if (iCmd == -1) { return strCfgData; }						// cmd not found	
 
 	strDesc = GetCmdDesc(strCmd);
@@ -436,6 +437,28 @@ string CConsoleHelper::ReplaceCmdDesc(string strCmd, string strCfgData)
 	}
 	strNew = strCfgData.substr(0,iCmd-1) + strDesc + strCfgData.substr(iStart);
 	return strNew;
+}
+
+string CConsoleHelper::AppendCmdDesc(string strCmd, string strCfgData)
+{
+	int iStart,iEnd,iCmd;
+	string strNew;
+	string strDesc;
+
+	strNew = "";
+	if (strCfgData.length() < 7) { return strCfgData; }	// no data
+	if (strCmd.length() != 4) {	return strCfgData; }		// bad command
+	iCmd = (int)strCfgData.find(strCmd+"=",0);
+	if (iCmd == -1) { return strCfgData; }						// cmd not found	
+	iEnd = (int)strCfgData.find(";",iCmd);
+	if (iEnd == -1) {return strCfgData; }			// data end found	
+	iStart = (int)strCfgData.find("=",iCmd);						 
+	if (iStart != (iCmd + 4)) { return strCfgData; }			// data start not found	
+	if (iStart >= iEnd) { return strCfgData; }		// data error
+	strDesc = GetCmdDesc(strCmd);
+	if (strDesc.length() == 0) { return strCfgData; }		// cmd desc  not found
+	strNew = strCfgData.substr(0,iEnd+1) + "    " + strDesc + strCfgData.substr(iEnd+1);
+ 	return strNew;
 }
 
 string CConsoleHelper::GetCmdDesc(string strCmd)
@@ -665,3 +688,173 @@ void CConsoleHelper::ConsoleGraph(long lData[], long chan, bool bLog, std::strin
 	}
 }
 
+string CConsoleHelper::CreateMCAData(long m_larDataBuffer[], SpectrumFileType sfInfo, DP4_FORMAT_STATUS cfgStatusLst)
+{
+	string strMCA;
+	string strText;
+	string strADC;
+	long idxChan;
+	string strData;
+	stringex strfn;
+
+	if (cfgStatusLst.SerialNumber <= 0) 
+	{
+		return ("");
+	}
+	strText = "";
+   	strMCA = "";
+    switch(sfInfo.m_iNumChan){
+        case 16384:
+            strADC = "6";
+				break;
+        case 8192:
+            strADC = "5";
+				break;
+        case 4096:
+            strADC = "4";
+				break;
+        case 2048:
+            strADC = "3";
+				break;
+        case 1024:
+            strADC = "2";
+				break;
+        case 512:
+            strADC = "1";
+				break;
+        case 256:
+            strADC = "0";
+				break;
+    }
+    strMCA += "<<PMCA SPECTRUM>>\r\n";
+    strMCA += "TAG - " + sfInfo.strTag + "\r\n";
+    strMCA += "DESCRIPTION - " + sfInfo.strDescription + "\r\n";
+    strMCA += "GAIN - " + strADC + "\r\n";
+    strMCA += "THRESHOLD - 0\r\n";
+    strMCA += "LIVE_MODE - 0\r\n";
+    strMCA += "PRESET_TIME - \r\n";
+	strText = strfn.Format("%lf", cfgStatusLst.AccumulationTime);
+    strMCA += "LIVE_TIME - " + strText + "\r\n";
+	strText = strfn.Format("%lf", cfgStatusLst.RealTime);
+    strMCA += "REAL_TIME - " + strText + "\r\n";
+    strMCA += "START_TIME - \r\n";
+	strText = strfn.Format("%i", sfInfo.SerialNumber);
+    strMCA += "SERIAL_NUMBER - " + strText + "\r\n";
+    strMCA += "<<DATA>>\r\n";
+	for (idxChan=0;idxChan<sfInfo.m_iNumChan;idxChan++) {
+		strData = strfn.Format("%i", m_larDataBuffer[idxChan]);
+		strMCA += strData + "\r\n";
+	}
+    strMCA += "<<END>>\r\n";
+	strMCA += "<<DP5 CONFIGURATION>>\r\n";
+	strMCA += sfInfo.strSpectrumConfig;
+	strMCA += "<<DP5 CONFIGURATION END>>\r\n";
+	strMCA += "<<DPP STATUS>>\r\n";
+	strMCA += sfInfo.strSpectrumStatus;	// this functin is included in most examples
+	strMCA += "<<DPP STATUS END>>\r\n";
+	return (strMCA);
+}
+
+void CConsoleHelper::SetSpectrumFile (char *infile){
+    SpectrumFile = infile ;
+}
+
+void CConsoleHelper::SaveSpectrumStringToFile(string strData)
+{
+	FILE  *out;
+	string strFilename;
+	string strError;
+	stringex strfn;
+
+    //strFilename = "SpectrumData.mca";
+    strFilename = SpectrumFile ;
+	if ( (out = fopen(strFilename.c_str(),"wb")) == (FILE *) NULL)
+		strError = strfn.Format("Couldn't open %s for writing.\n", strFilename.c_str());
+	else
+	{
+		fprintf(out,"%s",strData.c_str());
+	}
+	fclose(out);
+}
+
+string CConsoleHelper::CreateSpectrumConfig(string strRawCfgIn) 
+{
+	string strDisplayCfgOut;
+	string strCmdD;
+
+	strDisplayCfgOut = strRawCfgIn;
+	if (Dp5CmdList.size() > 0) {
+		for (unsigned int idxCmd=0;idxCmd<Dp5CmdList.size();idxCmd++) {
+			strCmdD = Dp5CmdList[idxCmd];
+			if (strCmdD.length() > 0) {
+				strDisplayCfgOut = AppendCmdDesc(strCmdD,strDisplayCfgOut);
+			}
+		}
+	}
+	return strDisplayCfgOut;
+}
+
+vector<string> CConsoleHelper::MakeDp5CmdList()
+{
+	vector<string> strCfgArr;
+	strCfgArr.clear();
+	strCfgArr.push_back("RESC");
+	strCfgArr.push_back("CLCK");
+	strCfgArr.push_back("TPEA");
+	strCfgArr.push_back("GAIF");
+	strCfgArr.push_back("GAIN");
+	strCfgArr.push_back("RESL");
+	strCfgArr.push_back("TFLA");
+	strCfgArr.push_back("TPFA");
+	strCfgArr.push_back("PURE");
+	strCfgArr.push_back("RTDE");
+	strCfgArr.push_back("MCAS");
+	strCfgArr.push_back("MCAC");
+	strCfgArr.push_back("SOFF");
+	strCfgArr.push_back("AINP");
+	strCfgArr.push_back("INOF");
+	strCfgArr.push_back("GAIA");
+	strCfgArr.push_back("CUSP");
+	strCfgArr.push_back("PDMD");
+	strCfgArr.push_back("THSL");
+	strCfgArr.push_back("TLLD");
+	strCfgArr.push_back("THFA");
+	strCfgArr.push_back("DACO");
+	strCfgArr.push_back("DACF");
+	strCfgArr.push_back("RTDS");
+	strCfgArr.push_back("RTDT");
+	strCfgArr.push_back("BLRM");
+	strCfgArr.push_back("BLRD");
+	strCfgArr.push_back("BLRU");
+	strCfgArr.push_back("GATE");
+	strCfgArr.push_back("AUO1");
+	strCfgArr.push_back("PRET");
+	strCfgArr.push_back("PRER");
+	strCfgArr.push_back("PREL");
+	strCfgArr.push_back("PREC");
+	strCfgArr.push_back("PRCL");
+	strCfgArr.push_back("PRCH");
+	strCfgArr.push_back("HVSE");
+	strCfgArr.push_back("TECS");
+	strCfgArr.push_back("PAPZ");
+	strCfgArr.push_back("PAPS");
+	strCfgArr.push_back("SCOE");
+	strCfgArr.push_back("SCOT");
+	strCfgArr.push_back("SCOG");
+	strCfgArr.push_back("MCSL");
+	strCfgArr.push_back("MCSH");
+	strCfgArr.push_back("MCST");
+	strCfgArr.push_back("AUO2");
+	strCfgArr.push_back("TPMO");
+	strCfgArr.push_back("GPED");
+	strCfgArr.push_back("GPIN");
+	strCfgArr.push_back("GPME");
+	strCfgArr.push_back("GPGA");
+	strCfgArr.push_back("GPMC");
+	strCfgArr.push_back("MCAE");
+	strCfgArr.push_back("VOLU");
+	strCfgArr.push_back("CON1");
+	strCfgArr.push_back("CON2");
+	strCfgArr.push_back("BOOT");
+	return strCfgArr;
+}

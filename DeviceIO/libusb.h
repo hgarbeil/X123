@@ -18,9 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+
+
 #ifndef LIBUSB_H
 #define LIBUSB_H
-
+#include "libusb.h"
 #ifdef _MSC_VER
 /* disable C4200 warning for nonstandard zero-sized array */
 #pragma warning(disable:4200)
