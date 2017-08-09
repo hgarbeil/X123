@@ -4,9 +4,9 @@
 
 using namespace std ;
 
-//X123::X123(QObject *parent) :
-//    QObject(parent)
-X123::X123 ()
+X123::X123(QObject *parent) :
+    QThread(parent)
+//X123::X123 ()
 {
     chdpp = new CConsoleHelper () ;
     haveSpec = false ;

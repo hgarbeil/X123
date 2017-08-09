@@ -7,10 +7,10 @@
 
 class X123 : public QThread
 {
-    //Q_OBJECT
+    Q_OBJECT
 public:
-    //explicit X123(QObject *parent = 0);
-    explicit X123 () ;
+    explicit X123(QObject *parent = 0);
+    //explicit X123 () ;
     ~X123 () ;
     CConsoleHelper *chdpp ;
     bool ConnectUSB() ;
