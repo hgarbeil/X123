@@ -1,10 +1,12 @@
 #include "x123.h"
 #include <iostream>
 #include <stdio.h>
+
 using namespace std ;
 
-X123::X123(QObject *parent) :
-    QObject(parent)
+//X123::X123(QObject *parent) :
+//    QObject(parent)
+X123::X123 ()
 {
     chdpp = new CConsoleHelper () ;
     haveSpec = false ;
@@ -139,7 +141,7 @@ bool X123::SendPresetAcquisitionTime(int sec)
 }
 
 // Clears spectrum data and starts acquisition
-void X123::StartAcquisition(){
+void X123::run(){
     int MaxMCA = curSecs / 2 + 1;
     int count = 0 ;
     bool bDisableMCA;
@@ -185,16 +187,18 @@ void X123::StartAcquisition(){
             }
         }
 
-    emit(endAcquire()) ;
     // Saving spectrum file
     SaveSpectrumFile() ;
+    emit(endAcquire()) ;
+
+
 }
 
 
 void X123::AcquireSpectrum() {
 
 
-    this->StartAcquisition () ;
+    this->start() ;
     // Saving spectrum file
     SaveSpectrumFile() ;
 

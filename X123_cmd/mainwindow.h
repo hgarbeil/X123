@@ -18,6 +18,8 @@ public:
     ~MainWindow();
     bool getSpectrometer () ;
     void getOutputSpectrumFile () ;
+    void setScanParams (char *, int) ;
+    void startAcquire () ;
 
     CConsoleHelper *chdpp ;
     X123 *x123 ;

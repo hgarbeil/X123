@@ -1,14 +1,16 @@
 #ifndef X123_H
 #define X123_H
 
-#include <QObject>
+//#include <QObject>
+#include <QThread>
 #include "ConsoleHelper.h"
 
-class X123 : public QObject
+class X123 : public QThread
 {
-    Q_OBJECT
+    //Q_OBJECT
 public:
-    explicit X123(QObject *parent = 0);
+    //explicit X123(QObject *parent = 0);
+    explicit X123 () ;
     ~X123 () ;
     CConsoleHelper *chdpp ;
     bool ConnectUSB() ;
@@ -17,7 +19,7 @@ public:
     void DisconnectUSB() ;
     bool readConfigFile () ;
     void AcquireSpectrum () ;
-    void StartAcquisition() ;
+    void run () ;
     bool ClearSpectrum () ;
     // Saving spectrum file
     void SaveSpectrumFile() ;

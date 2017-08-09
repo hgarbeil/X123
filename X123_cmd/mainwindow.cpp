@@ -108,10 +108,18 @@ void MainWindow::on_acquireButton_clicked()
 
     ui->acquireButton->setStyleSheet("color:black;background-color:yellow") ;
     totalSecs = 0 ;
-    x123->StartAcquisition() ;
+    x123->start() ;
 
 }
 
+
+void MainWindow::setScanParams (char *outfile, int timeSecs) {
+    x123->SendPresetAcquisitionTime (timeSecs);
+    x123->SetSpectrumFile (outfile) ;
+
+
+
+}
 
 // get timestamped ouput file
 void MainWindow::getOutputSpectrumFile() {
@@ -164,10 +172,16 @@ void MainWindow::endAcquire() {
     setStatusLabel ("Acquisition Complete") ;
     ui->acquireButton->setStyleSheet("color:yellow;background-color:green") ;
     this->setCursor (Qt::ArrowCursor) ;
+    exit(0);
+
 }
 
 void MainWindow::on_PrefixBrowseButton_clicked()
 {
     QString prefx = QFileDialog::getSaveFileName (this, "Output Spectrum File Prefix") ;
     ui->PrefixLE->setText(prefx) ;
+}
+
+void MainWindow::startAcquire () {
+    x123->start() ;
 }
