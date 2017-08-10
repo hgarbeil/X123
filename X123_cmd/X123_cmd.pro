@@ -48,4 +48,4 @@ FORMS    += mainwindow.ui \
 
 INCLUDEPATH += ../DeviceIO C:/Users/przem/workdir/libusb/
 
-LIBS += -L../DeviceIO -LC:/Users/przem/workdir/libusb/MinGW32/dll -lstdc++ -lm -lusb
+LIBS += -L../DeviceIO -LC:/Users/przem/workdir/libusb/MinGW32/dll -lstdc++ -lm -lusb-1.0
