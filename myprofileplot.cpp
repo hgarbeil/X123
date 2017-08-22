@@ -27,7 +27,7 @@ MyProfilePlot::MyProfilePlot(QWidget *parent) :
     yAxis->setLabel("Counts");
     // set axes ranges, so we see all data:
     xAxis->setRange(0,nptsProfile);
-    yAxis->setRange(-5, 20);
+    yAxis->setRange(-1, 100);
     //vline = new QCPItemLine (this) ;
     //vline->start->setCoords (QPointF(104.,0.)) ;
     //vline->end->setCoords(QPointF(104, 14000)) ;
@@ -97,7 +97,7 @@ void MyProfilePlot::setXYData (float *x, float *y, int npts){
     }
     graph(0)->setData(xdata, ydata) ;
 
-    yAxis->rescale (true) ;
+    //yAxis->rescale (true) ;
     //rescaleAxes() ;
     this->replot() ;
 }
@@ -115,7 +115,7 @@ void MyProfilePlot::setXYData2 (float *x, float *y, int npts){
     graph(1)->setData(xdata, ydata) ;
 
     //yAxis->rescale (true) ;
-    //rescaleAxes() ;
+    rescaleAxes() ;
     this->replot() ;
 }
 

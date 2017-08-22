@@ -114,6 +114,8 @@ void MainWindow::on_acquireButton_clicked()
 
 
 void MainWindow::setScanParams (char *outfile, int timeSecs) {
+    QString qstr = QString("%1").arg(timeSecs) ;
+    ui->accumTimeLE->setText (qstr) ;
     x123->SendPresetAcquisitionTime (timeSecs);
     x123->SetSpectrumFile (outfile) ;
 
